@@ -1,3 +1,8 @@
+import json
+import sys
+
+class JSONFileException(Exception):
+    pass
 
 class Enigma:
     def __init__(self, hash_map, wheels, reflector_map):
@@ -32,8 +37,7 @@ class Enigma:
                 rotor3 = 0
 
         return encrypted_message
-        
-        
+
 def encrypt_c(c, W1, W2, W3, hash_map, reflector_map):
 
     shift = ((2 * W1) - W2 + W3) % 26
@@ -61,7 +65,7 @@ def encrypt_c(c, W1, W2, W3, hash_map, reflector_map):
             return key
 
 def load_enigma_from_path(path):
-    
+
     try:
         with open(path, 'r') as file:
             data = json.load(file)
@@ -80,7 +84,63 @@ def load_enigma_from_path(path):
     return Enigma(substitution_map, rotors, reflector)
 
 def print_usage_and_exit():
-    
+
     print("Usage: python3 enigma.py -c <config_file> -i <input_file> -o <output_file>")
     sys.exit(1)
 
+if __name__ == "__main__":
+    try:
+        if len(sys.argv) < 5:
+            print_usage_and_exit()
+
+        config_file = None
+        input_file = None
+        output_file = None
+
+        i = 1
+        while i < len(sys.argv):
+            flag = sys.argv[i]
+
+            if flag not in ['-c', '-i', '-o']:
+                print_usage_and_exit()
+
+            if i + 1 >= len(sys.argv):
+                print_usage_and_exit()
+
+            value = sys.argv[i + 1]
+            if flag == '-c':
+                config_file = value
+            elif flag == '-i':
+                input_file = value
+            elif flag == '-o':
+                output_file = value
+
+            i += 2
+
+        if not config_file or not input_file:
+            print_usage_and_exit()
+
+        try:
+            with open(input_file, 'r') as input_f:
+                lines = input_f.readlines()
+
+            enigma_machine = load_enigma_from_path(config_file)
+
+            encrypted_lines = [enigma_machine.encrypt(line.rstrip('\n')) for line in lines]
+            encrypted_message = '\n'.join(encrypted_lines) + '\n'
+
+            if output_file:
+                with open(output_file, 'w') as output_f:
+                    output_f.write(encrypted_message)
+            else:
+                print(encrypted_message)
+
+        except Exception:
+            print("The enigma script has encountered an error")
+            sys.exit(1)
+
+    except SystemExit:
+        raise
+    except:
+        print("The enigma script has encountered an error")
+        sys.exit(1)
