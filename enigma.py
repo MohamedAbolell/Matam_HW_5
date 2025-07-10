@@ -16,7 +16,7 @@ class Enigma:
         counter = 0
 
         for char in message:
-            encrypted_char = encrypt_c(char, rotor1, rotor2, rotor3,
+            encrypted_char = encryptchar(char, rotor1, rotor2, rotor3,
                                       self.substitution_map, self.reflector)
             encrypted_message += encrypted_char
 
@@ -38,7 +38,7 @@ class Enigma:
 
         return encrypted_message
 
-def encrypt_c(c, W1, W2, W3, hash_map, reflector_map):
+def encryptchar(c, W1, W2, W3, hash_map, reflector_map):
 
     shift = ((2 * W1) - W2 + W3) % 26
 
@@ -119,6 +119,7 @@ if __name__ == "__main__":
 
         if not config_file or not input_file:
             print_usage_and_exit()
+            sys.exit(1)
 
         try:
             with open(input_file, 'r') as input_f:
