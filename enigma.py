@@ -61,4 +61,26 @@ def encrypt_c(c, W1, W2, W3, hash_map, reflector_map):
             return key
 
 def load_enigma_from_path(path):
-    pass
+    
+    try:
+        with open(path, 'r') as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        raise JSONFileException(f"Could not load a valid Enigma JSON file from: {path}")
+
+    required_fields = ['hash_map', 'wheels', 'reflector_map']
+    for field in required_fields:
+        if field not in data:
+            raise JSONFileException(f"Missing required field: {field}")
+
+    substitution_map = data['hash_map']
+    rotors = data['wheels']
+    reflector = data['reflector_map']
+
+    return Enigma(substitution_map, rotors, reflector)
+
+def print_usage_and_exit():
+    
+    print("Usage: python3 enigma.py -c <config_file> -i <input_file> -o <output_file>")
+    sys.exit(1)
+
