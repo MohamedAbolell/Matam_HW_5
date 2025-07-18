@@ -69,7 +69,7 @@ def load_enigma_from_path(path):
     try:
         with open(path, 'r') as file:
             data = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, ValueError):
         raise JSONFileException(f"Could not load a valid Enigma JSON file from: {path}")
 
     required_fields = ['hash_map', 'wheels', 'reflector_map']
